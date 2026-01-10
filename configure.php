@@ -157,7 +157,6 @@ function getGitHubApiEndpoint(string $endpoint): ?stdClass
         $response = curl_exec($curl);
         $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-        curl_close($curl);
 
         if ($statusCode === 200) {
             return json_decode($response);
@@ -254,8 +253,8 @@ $authorUsername = ask('Author username', guessGitHubUsername());
 
 $guessGitHubVendorInfo = guessGitHubVendorInfo($authorName, $authorUsername);
 
-$vendorName = ask('Vendor name', $guessGitHubVendorInfo[0]);
-$vendorUsername = ask('Vendor username', $guessGitHubVendorInfo[1] ?? slugify($vendorName));
+$vendorName = 'Foodieneers';
+$vendorUsername = 'Foodieneers';
 $vendorSlug = slugify($vendorUsername);
 
 $vendorNamespace = str_replace('-', '', ucwords($vendorName));
@@ -273,11 +272,6 @@ $className = ask('Class name', $className);
 $variableName = lcfirst($className);
 $description = ask('Package description', "This is my package {$packageSlug}");
 
-$usePhpStan = confirm('Enable PhpStan?', true);
-$useLaravelPint = confirm('Enable Laravel Pint?', true);
-$useDependabot = confirm('Enable Dependabot?', true);
-$useLaravelRay = confirm('Use Ray for debugging?', true);
-$useUpdateChangelogWorkflow = confirm('Use automatic changelog updater workflow?', true);
 
 writeln('------');
 writeln("Author     : {$authorName} ({$authorUsername}, {$authorEmail})");
@@ -286,13 +280,7 @@ writeln("Package    : {$packageSlug} <{$description}>");
 writeln("Namespace  : {$vendorNamespace}\\{$className}");
 writeln("Class name : {$className}");
 writeln('---');
-writeln('Packages & Utilities');
-writeln('Use Laravel/Pint     : '.($useLaravelPint ? 'yes' : 'no'));
-writeln('Use Larastan/PhpStan : '.($usePhpStan ? 'yes' : 'no'));
-writeln('Use Dependabot       : '.($useDependabot ? 'yes' : 'no'));
-writeln('Use Ray App          : '.($useLaravelRay ? 'yes' : 'no'));
-writeln('Use Auto-Changelog   : '.($useUpdateChangelogWorkflow ? 'yes' : 'no'));
-writeln('------');
+
 
 writeln('This script will replace the above values in all relevant files in the project directory.');
 
@@ -332,39 +320,8 @@ foreach ($files as $file) {
     };
 }
 
-if (! $useLaravelPint) {
-    safeUnlink(__DIR__.'/.github/workflows/fix-php-code-style-issues.yml');
-    safeUnlink(__DIR__.'/pint.json');
-}
+writeln('Executing `composer install` and running tests');
+run('composer install && composer test');
 
-if (! $usePhpStan) {
-    safeUnlink(__DIR__.'/phpstan.neon.dist');
-    safeUnlink(__DIR__.'/phpstan-baseline.neon');
-    safeUnlink(__DIR__.'/.github/workflows/phpstan.yml');
-
-    remove_composer_deps([
-        'phpstan/extension-installer',
-        'phpstan/phpstan-deprecation-rules',
-        'phpstan/phpstan-phpunit',
-        'larastan/larastan',
-    ]);
-
-    remove_composer_script('phpstan');
-}
-
-if (! $useDependabot) {
-    safeUnlink(__DIR__.'/.github/dependabot.yml');
-    safeUnlink(__DIR__.'/.github/workflows/dependabot-auto-merge.yml');
-}
-
-if (! $useLaravelRay) {
-    remove_composer_deps(['spatie/laravel-ray']);
-}
-
-if (! $useUpdateChangelogWorkflow) {
-    safeUnlink(__DIR__.'/.github/workflows/update-changelog.yml');
-}
-
-confirm('Execute `composer install` and run tests?') && run('composer install && composer test');
-
-confirm('Let this script delete itself?', true) && unlink(__FILE__);
+writeln('The script will delete.') ;
+unlink(__FILE__);

@@ -7,7 +7,6 @@
         ":package_slug"
     ],
     "homepage": "https://github.com/:vendor_slug/:package_slug",
-    "license": "MIT",
     "authors": [
         {
             "name": ":author_name",
@@ -21,17 +20,10 @@
         "illuminate/contracts": "^11.0||^12.0"
     },
     "require-dev": {
-        "laravel/pint": "^1.14",
-        "nunomaduro/collision": "^8.8",
-        "larastan/larastan": "^3.0",
-        "orchestra/testbench": "^10.0.0||^9.0.0",
-        "pestphp/pest": "^4.0",
-        "pestphp/pest-plugin-arch": "^4.0",
-        "pestphp/pest-plugin-laravel": "^4.0",
-        "phpstan/extension-installer": "^1.4",
-        "phpstan/phpstan-deprecation-rules": "^2.0",
-        "phpstan/phpstan-phpunit": "^2.0",
-        "spatie/laravel-ray": "^1.35"
+        "foodieneers/laravel-devtools": "dev-main",
+        "matthewbdaly/artisan-standalone": "*",
+        "nunomaduro/mock-final-classes": "^1.2",
+        "orchestra/testbench": "*"
     },
     "autoload": {
         "psr-4": {
@@ -46,12 +38,20 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": "@composer run prepare",
-        "prepare": "@php vendor/bin/testbench package:discover --ansi",
-        "analyse": "vendor/bin/phpstan analyse",
-        "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/pint"
+
+    "dep:bump": "composer bump",
+    "lint": [
+        "rector",
+        "pint --parallel"
+    ],
+    "test:type-coverage": "pest --type-coverage --min=100",
+    "test:lint": [
+        "pint --parallel --test",
+        "rector --dry-run"
+    ],
+    "pest": "pest",
+    "test:unit": "pest --parallel --coverage --exactly=100.0",
+    "test:types": "phpstan"
     },
     "config": {
         "sort-packages": true,
