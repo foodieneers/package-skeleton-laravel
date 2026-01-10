@@ -51,7 +51,13 @@
     ],
     "pest": "pest",
     "test:unit": "pest --parallel --coverage --exactly=100.0",
-    "test:types": "phpstan"
+    "test:types": "phpstan",
+     "test": [
+        "@test:type-coverage",
+        "@test:unit",
+        "@test:lint",
+        "@test:types"
+    ]
     },
     "config": {
         "sort-packages": true,
