@@ -1,6 +1,7 @@
 {
     "name": ":vendor_slug/:package_slug",
     "description": ":package_description",
+    "type": "library",
     "keywords": [
         ":vendor_name",
         "laravel",
